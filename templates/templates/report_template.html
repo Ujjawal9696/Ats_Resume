@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; background: #fff; font-size: 13px; }
+
+  .header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white; padding: 32px 40px;
+  }
+  .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .header p { opacity: 0.85; margin-top: 4px; font-size: 13px; }
+  .badge {
+    display: inline-block; background: rgba(255,255,255,0.2);
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; margin-top: 8px;
+  }
+
+  .content { padding: 32px 40px; }
+
+  .score-hero {
+    text-align: center; padding: 28px;
+    background: linear-gradient(135deg, #f8f9ff, #eef2ff);
+    border-radius: 16px; margin-bottom: 28px; border: 1px solid #e0e7ff;
+  }
+  .score-number {
+    font-size: 72px; font-weight: 800;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .score-label { font-size: 14px; color: #6b7280; margin-top: 6px; font-weight: 500; }
+  .score-grade { font-size: 22px; font-weight: 700; margin-top: 8px; }
+  .grade-excellent { color: #059669; }
+  .grade-good { color: #d97706; }
+  .grade-poor { color: #dc2626; }
+
+  .section { margin-bottom: 28px; }
+  .section-title {
+    font-size: 16px; font-weight: 700; color: #1a1a2e;
+    border-left: 4px solid #667eea; padding-left: 12px; margin-bottom: 16px;
+  }
+
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .metric-card {
+    background: #f8f9ff; border: 1px solid #e0e7ff;
+    border-radius: 12px; padding: 16px; text-align: center;
+  }
+  .metric-value { font-size: 24px; font-weight: 800; color: #667eea; }
+  .metric-label {
+    font-size: 11px; color: #6b7280; margin-top: 4px;
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .progress-bar {
+    height: 8px; background: #e5e7eb; border-radius: 4px;
+    overflow: hidden; margin-top: 8px;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+  }
+
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill-tag { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .skill-matched { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .skill-missing { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+  .suggestion-list { list-style: none; }
+  .suggestion-list li {
+    padding: 10px 14px; background: #f8f9ff;
+    border-left: 3px solid #667eea; border-radius: 0 8px 8px 0;
+    margin-bottom: 8px; font-size: 12px; line-height: 1.5;
+  }
+
+  .job-info {
+    background: #f8f9ff; border-radius: 12px; padding: 16px;
+    border: 1px solid #e0e7ff; margin-bottom: 24px;
+  }
+  .job-info h3 { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+  .job-info p { color: #6b7280; font-size: 12px; margin-top: 2px; }
+
+  .footer {
+    text-align: center; padding: 20px; color: #9ca3af;
+    font-size: 11px; border-top: 1px solid #f3f4f6; margin-top: 32px;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  .keyword-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
+  .keyword-tag {
+    padding: 3px 10px; background: #ede9fe; color: #5b21b6;
+    border-radius: 20px; font-size: 10px; font-weight: 600;
+  }
+  .missing-kw { background: #fef3c7; color: #92400e; }
+
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎯 ATS Resume Analysis Report</h1>
+  <p>Generated for {{ user_name }} on {{ generated_date }}</p>
+  {% if job_title %}
+  <span class="badge">{{ job_title }}{% if company_name %} @ {{ company_name }}{% endif %}</span>
+  {% endif %}
+</div>
+
+<div class="content">
+
+  {% if job_title or company_name %}
+  <div class="job-info">
+    <h3>{{ job_title or "Position" }}</h3>
+    {% if company_name %}<p>{{ company_name }}</p>{% endif %}
+  </div>
+  {% endif %}
+
+  <!-- ATS Score Hero -->
+  <div class="score-hero">
+    <div class="score-number">{{ ats_score }}</div>
+    <div class="score-label">ATS Compatibility Score</div>
+    <div class="score-grade {{ grade_class }}">{{ grade_label }}</div>
+  </div>
+
+  <!-- Metrics Grid -->
+  <div class="section">
+    <div class="section-title">📊 Score Breakdown</div>
+    <div class="metrics-grid">
+      {% for metric in metrics %}
+      <div class="metric-card">
+        <div class="metric-value">{{ metric.value }}%</div>
+        <div class="metric-label">{{ metric.label }}</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:{{ metric.value }}%"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Skills -->
+  <div class="two-col">
+    <div class="section">
+      <div class="section-title">✅ Matched Skills ({{ matched_skills|length }})</div>
+      <div class="skills-grid">
+        {% for skill in matched_skills[:20] %}
+        <span class="skill-tag skill-matched">{{ skill }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">❌ Missing Skills ({{ missing_skills|length }})</div>
+      <div class="skills-grid">
+        {% for skill in missing_skills[:20] %}
+        <span class="skill-tag skill-missing">{{ skill }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Keywords -->
+  <div class="two-col">
+    <div class="section">
+      <div class="section-title">🔑 Matched Keywords</div>
+      <div class="keyword-cloud">
+        {% for kw in matched_keywords[:15] %}
+        <span class="keyword-tag">{{ kw }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">⚠️ Missing Keywords</div>
+      <div class="keyword-cloud">
+        {% for kw in missing_keywords[:15] %}
+        <span class="keyword-tag missing-kw">{{ kw }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Suggestions -->
+  {% if ai_suggestions %}
+  <div class="section">
+    <div class="section-title">🤖 AI-Powered Recommendations</div>
+    {% if ai_suggestions.overall_summary %}
+    <p style="color:#374151;margin-bottom:14px;line-height:1.6;font-size:12px;
+              padding:12px;background:#f8f9ff;border-radius:8px;">
+      {{ ai_suggestions.overall_summary }}
+    </p>
+    {% endif %}
+    <ul class="suggestion-list">
+      {% for tip in ai_suggestions.optimization_tips[:5] %}
+      <li>💡 {{ tip }}</li>
+      {% endfor %}
+      {% for tip in ai_suggestions.ats_feedback[:3] %}
+      <li>🎯 {{ tip }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% if ai_suggestions.better_bullet_points %}
+  <div class="section">
+    <div class="section-title">✍️ Improved Bullet Points</div>
+    <ul class="suggestion-list">
+      {% for bullet in ai_suggestions.better_bullet_points[:4] %}
+      <li>→ {{ bullet }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  {% endif %}
+
+</div>
+
+<div class="footer">
+  Generated by ATS Resume Scorer • {{ generated_date }} • Powered by Groq AI + spaCy NLP
+</div>
+
+</body>
+</html>

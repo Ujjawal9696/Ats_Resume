@@ -1,0 +1,46 @@
+# ── ATS Resume Scorer ──────────────────────────────
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Environment Variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Uploads & Reports (runtime generated)
+uploads/
+reports/
+logs/
+
+# NLP Models (downloaded at runtime)
+ml_models/*.bin
+ml_models/*.pt
+
+# Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Misc
+*.log
+*.tmp
